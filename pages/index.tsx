@@ -2,6 +2,8 @@ import Head from "next/head";
 import Image from "next/image";
 import styles from "../styles/Home.module.css";
 import firebase from "../firebase/clientApp";
+import { getFirestore, collection, setDoc, doc } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useCollection } from "react-firebase-hooks/firestore";
 import React from "react";
@@ -13,23 +15,23 @@ type VoteDocument = {
 };
 
 export default function Home() {
+  const auth = getAuth(firebase);
   // Firestore
-  const db = firebase.firestore();
+  const db = getFirestore(firebase);
 
   // User Authentication
-  const [user, loading, error] = useAuthState(firebase.auth());
+  const [user, loading, error] = useAuthState(auth);
 
   // Votes Collection
   const [votes, votesLoading, votesError] = useCollection(
-    firebase.firestore().collection("votes"),
+    collection(db, "votes"),
     {}
   );
 
-  // Create document function
-  const addVoteDocument = async (vote: string) => {
-    await db.collection("votes").doc(user.uid).set({
-      vote,
-    });
+  console.log(votes);
+
+  const addVoteDocument = async (vote: VoteDocument) => {
+    await setDoc(doc(db, "votes", user.uid), vote);
   };
 
   return (
@@ -55,7 +57,7 @@ export default function Home() {
           <div style={{ flexDirection: "row", display: "flex" }}>
             <button
               style={{ fontSize: 32, marginRight: 8 }}
-              onClick={() => addVoteDocument("yes")}
+              onClick={() => addVoteDocument({ vote: "yes" })}
             >
               ✔️🍍🍕
             </button>
@@ -71,7 +73,7 @@ export default function Home() {
           <div style={{ flexDirection: "row", display: "flex" }}>
             <button
               style={{ fontSize: 32, marginRight: 8 }}
-              onClick={() => addVoteDocument("no")}
+              onClick={() => addVoteDocument({ vote: "no" })}
             >
               ❌🍍🍕
             </button>
@@ -95,9 +97,7 @@ export default function Home() {
               }}
             >
               {votes?.docs?.map((doc) => (
-                <>
-                  <VoterList id={doc.id} key={doc.id} vote={doc.data().vote} />
-                </>
+                <VoterList id={doc.id} key={doc.id} vote={doc.data().vote} />
               ))}
             </div>
           </div>

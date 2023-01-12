@@ -1,6 +1,7 @@
 import React, { ReactElement } from "react";
 import { useDocument } from "react-firebase-hooks/firestore";
 import firebase from "../firebase/clientApp";
+import { getFirestore, doc } from "firebase/firestore";
 
 interface Props {
   // id is the id of the vote document
@@ -10,9 +11,10 @@ interface Props {
 }
 
 export default function VoterList({ id, vote }: Props): ReactElement {
-  const [value, loading, error] = useDocument(
-    firebase.firestore().doc(`users/${id}`)
-  );
+  // Firestore
+  const db = getFirestore(firebase);
+
+  const [value, loading, error] = useDocument(doc(db, `users/${id}`));
 
   if (loading) {
     return <h6>Loading...</h6>;
@@ -38,10 +40,10 @@ export default function VoterList({ id, vote }: Props): ReactElement {
           marginTop: "8px",
           marginRight: "8px",
         }}
-        src={value.data().photoURL}
+        src={value?.data()?.photoURL}
       />
       <div>
-        <h4 style={{ marginBottom: 0 }}>{value.data().displayName}</h4>
+        <h4 style={{ marginBottom: 0 }}>{value?.data()?.displayName}</h4>
         <h4 style={{ marginTop: 0 }}>
           Voted: {vote === "yes" ? "✔️🍍" : "❌🍍"}
         </h4>
