@@ -1,13 +1,11 @@
-import Head from "next/head";
-import Image from "next/image";
-import styles from "../styles/Home.module.css";
+"use client";
+
 import firebase from "../firebase/clientApp";
 import { getFirestore, collection, setDoc, doc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useCollection } from "react-firebase-hooks/firestore";
 import React from "react";
-import Auth from "../components/Auth";
 import VoterList from "../components/VoterList";
 
 type VoteDocument = {
@@ -28,8 +26,6 @@ export default function Home() {
     {}
   );
 
-  console.log(votes);
-
   const addVoteDocument = async (vote: VoteDocument) => {
     await setDoc(doc(db, "votes", user.uid), vote);
   };
@@ -39,7 +35,6 @@ export default function Home() {
       style={{
         display: "flex",
         height: "100vh",
-        width: "100vw",
         alignItems: "center",
         justifyContent: "center",
         flexDirection: "column",
@@ -49,46 +44,45 @@ export default function Home() {
       }}
     >
       {loading && <h4>Loading...</h4>}
-      {!user && <Auth />}
       {user && (
         <>
-          <h1>Pineapple on Pizza?</h1>
+          <h1 className="text-3xl mb-6">Pineapple on Pizza?</h1>
 
-          <div style={{ flexDirection: "row", display: "flex" }}>
+          <div className="flex flex-col">
             <button
-              style={{ fontSize: 32, marginRight: 8 }}
+              className="vote-card"
               onClick={() => addVoteDocument({ vote: "yes" })}
             >
               ✔️🍍🍕
+              <h3>
+                Pineapple Lovers{" "}
+                {
+                  votes?.docs?.filter(
+                    (doc) => (doc.data() as VoteDocument).vote === "yes"
+                  ).length
+                }
+              </h3>
             </button>
-            <h3>
-              Pineapple Lovers:{" "}
-              {
-                votes?.docs?.filter(
-                  (doc) => (doc.data() as VoteDocument).vote === "yes"
-                ).length
-              }
-            </h3>
           </div>
           <div style={{ flexDirection: "row", display: "flex" }}>
             <button
-              style={{ fontSize: 32, marginRight: 8 }}
+              className="vote-card"
               onClick={() => addVoteDocument({ vote: "no" })}
             >
               ❌🍍🍕
+              <h3>
+                Pineapple Haters{" "}
+                {
+                  votes?.docs?.filter(
+                    (doc) => (doc.data() as VoteDocument).vote === "no"
+                  ).length
+                }
+              </h3>
             </button>
-            <h3>
-              Pineapple Haters:{" "}
-              {
-                votes?.docs?.filter(
-                  (doc) => (doc.data() as VoteDocument).vote === "no"
-                ).length
-              }
-            </h3>
           </div>
 
           <div style={{ marginTop: "64px" }}>
-            <h3>Voters:</h3>
+            <h3 className="text-3xl mb-6">Results</h3>
             <div
               style={{
                 maxHeight: "320px",

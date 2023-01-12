@@ -1,7 +1,10 @@
+"use client";
+
 import React, { ReactElement } from "react";
 import { useDocument } from "react-firebase-hooks/firestore";
 import firebase from "../firebase/clientApp";
 import { getFirestore, doc } from "firebase/firestore";
+import Image from "next/image";
 
 interface Props {
   // id is the id of the vote document
@@ -10,7 +13,7 @@ interface Props {
   vote: string;
 }
 
-export default function VoterList({ id, vote }: Props): ReactElement {
+function VoterList({ id, vote }: Props): ReactElement {
   // Firestore
   const db = getFirestore(firebase);
 
@@ -25,29 +28,22 @@ export default function VoterList({ id, vote }: Props): ReactElement {
   }
 
   return (
-    <div
-      style={{
-        maxWidth: "320px",
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "center",
-      }}
-    >
-      <img
-        style={{
-          borderRadius: "50%",
-          maxHeight: "48px",
-          marginTop: "8px",
-          marginRight: "8px",
-        }}
+    <div className="max-w-[320px] flex items-center m-4">
+      <Image
+        width="35"
+        height="35"
+        className="border-0 mt-1 mr-4 rounded-full"
         src={value?.data()?.photoURL}
+        alt={value?.data()?.uid}
       />
       <div>
         <h4 style={{ marginBottom: 0 }}>{value?.data()?.displayName}</h4>
-        <h4 style={{ marginTop: 0 }}>
-          Voted: {vote === "yes" ? "✔️🍍" : "❌🍍"}
+        <h4 className="mt-0 text-2xl" style={{ marginTop: 0 }}>
+          Voted {vote === "yes" ? "✔️🍍" : "❌🍍"}
         </h4>
       </div>
     </div>
   );
 }
+
+export default VoterList;
